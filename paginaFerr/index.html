@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferreteria</title>
+    <link rel="stylesheet" href="/style">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+</head>
+<body>
+    <h1 class="centrar">Bienvenido a Ferreterias Alberto</h1>
+    <div class="forms">
+        <ul>
+            <li><input type="text" name="herramienta" id="nombre" placeholder="Nombre" required></li>
+            <li><input type="text" name="" id="herramienta" placeholder="Herramienta"></li>
+            <li><input type="number" name="" id="precio" placeholder="precio" required></li>
+            <li><input type="file"  id="img" required></li>
+            <li><input class="subir" type="button" value="Subir" onclick="Almacenar()"></li>
+        </ul>
+    </div>
+
+
+    <div class="forms-2">
+        <ul>
+            <li><input type="text" name="herramienta" id="nombre" placeholder="Nombre" required></li>
+            <li><input type="text" name="" id="herramienta" placeholder="Herramienta"></li>
+            <li><input type="number" name="" id="precio" placeholder="precio" required></li>
+            <li><input type="file"  id="img" required></li>
+            <li><input class="subir" type="button" value="Subir" onclick="Almacenar()"></li>
+        </ul>
+    </div>
+
+
+<div class="container" id="container">
+    
+</div>
+
+
+
+</body>
+<script src="/FrondEnd"></script>
+<script>
+
+
+
+
+
+let herramienta = new Herramienta();
+
+let imagenes64 = "";
+$("#img").change(function(){
+    readURL(this);
+});
+let reader = new FileReader();
+function readURL(input){
+    if(input.files && input.files[0]){
+        reader.onload = function(e){
+            imagenes64 = e.target.result;
+        }
+    }
+    reader.readAsDataURL(input.files[0]);
+}
+
+
+const Almacenar = ()=>{
+    herramienta.nombre = document.getElementById('nombre').value;
+    herramienta.herramienta = document.getElementById('herramienta').value;
+    herramienta.precio = document.getElementById('precio').value;
+    herramienta.imagen = imagenes64
+    herramienta.Guardar().then(function(response){
+                        alert("Guardado")
+                        location.reload();
+                    },
+                    (err)=>{
+                        alert(err)
+                    })
+}
+
+
+function comprar(precio,obj){
+
+
+
+    let tarjeta = [0891];
+
+    alert(`El precio es de ${precio} mil`)
+    let resultado = prompt(`Ingrese su tarjeta`)
+    if(resultado && resultado == tarjeta[0]){
+        alert(`Compra ejecutada`);
+        eliminar(obj);
+    }else if(tarjeta[0]){
+        alert(`Error con la tarjeta`)
+    }
+
+}
+
+const eliminar = (obj)=>{
+    herramienta._id = obj
+    console.log(herramienta._id)
+    herramienta.Eliminar().then(function(response){
+
+    alert('Dato eliminado');
+    location.reload();
+    })
+    
+}
+
+
+const modificar = (obj)=>{
+    
+    const forms_2 = document.querySelector(".forms-2").style.visibility = "hidden";
+    //Formulario
+
+    herramienta.nombre = nom;
+    herramienta.herramienta = her;
+    herramienta.precio = pre;
+    herramienta.imagen = img;
+    herramienta._id = obj
+    herramienta.modificar().then(function(response){
+        alert('Modificado')
+        location.reload();
+    })
+
+
+ 
+}
+
+
+
+let container = document.querySelector('.container');
+
+const publicaciones = ()=>{
+
+    herramienta.todas().then(function(response){
+        console.log("Succes!", response);
+        localStorage.setItem('todaslaspeliculasdelperiodo', JSON.stringify(response))
+
+    for(elemento in response){
+
+    let newDiv = document.createElement('div');
+    newDiv.classList.add('columns');
+    newDiv.innerHTML =
+    `<ul>
+    <li><h3> Usuario: ${response[elemento].nombre} </h2></li>
+    <li><h3> Herramienta: ${response[elemento].herramienta}</h3></li>
+    <li><h4> Precio $:${response[elemento].precio}</h4></li>
+    <li><img src = '${response[elemento].imagen}'/></li>`+
+    '<div class="btn"><input type="button" class="botonesTab" value="Comprar" onclick="comprar(\''+response[elemento].precio+'\',\''+response[elemento]._id+'\')" />'+
+        '<div class="btn"><input type="button" class="botonesTab" value="Modificar" onclick="modificar(\''+response[elemento]._id+'\')" />'+
+    `</ul></div>` 
+    container.appendChild(newDiv);
+    }
+});
+    
+}
+
+publicaciones();
+
+</script>
+</html>
